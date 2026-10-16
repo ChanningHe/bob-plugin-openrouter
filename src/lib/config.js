@@ -6,6 +6,7 @@ const MAX_TEMPERATURE = 2;
 
 // identifier -> { title, values, default } for every menu option.
 const MENUS = {
+  mode: { title: '模式', values: ['translate', 'polish', 'custom'], default: 'translate' },
   reasoning: {
     title: '思考模式',
     values: ['default', 'off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'budget'],
@@ -96,6 +97,13 @@ function build(options) {
   const model = str(options.model);
   if (!model) throw new ConfigError('param', '请先在插件设置中填写模型，例如 google/gemini-2.5-flash');
 
+  const mode = menu(options, 'mode');
+  const systemPrompt = str(options.systemPrompt) || null;
+  const userPrompt = str(options.userPrompt) || null;
+  if (mode === 'custom' && !systemPrompt && !userPrompt) {
+    throw new ConfigError('param', '自定义模式需要填写「系统提示词」或「用户提示词」');
+  }
+
   const reasoning = menu(options, 'reasoning');
   const cache = menu(options, 'responseCache');
 
@@ -103,6 +111,7 @@ function build(options) {
     apiKey,
     model,
     fallbackModels: list(options.fallbackModels),
+    mode,
     reasoning,
     reasoningBudget: reasoning === 'budget' ? positiveInt(str(options.reasoningBudget), '思考 Token 预算') : null,
     showReasoning: menu(options, 'showReasoning') === 'show',
@@ -110,8 +119,8 @@ function build(options) {
     providerOnly: list(options.providerOnly),
     providerIgnore: list(options.providerIgnore),
     dataPolicy: menu(options, 'dataPolicy'),
-    systemPrompt: str(options.systemPrompt) || null,
-    userPrompt: str(options.userPrompt) || null,
+    systemPrompt,
+    userPrompt,
     polishMode: menu(options, 'polishMode') === 'on',
     showRouteInfo: menu(options, 'showRouteInfo') === 'on',
     temperature: optionalTemperature(str(options.temperature)),

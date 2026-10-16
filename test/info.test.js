@@ -21,7 +21,10 @@ test('option identifiers are unique', () => {
 test('every menu value is accepted by parseConfig', () => {
   for (const opt of info.options.filter((o) => o.type === 'menu')) {
     for (const { value } of opt.menuValues) {
-      const extra = opt.identifier === 'reasoning' && value === 'budget' ? { reasoningBudget: '100' } : {};
+      const extra =
+        (opt.identifier === 'reasoning' && value === 'budget' && { reasoningBudget: '100' }) ||
+        (opt.identifier === 'mode' && value === 'custom' && { userPrompt: '$text' }) ||
+        {};
       const { error } = parseConfig({ ...base, ...extra, [opt.identifier]: value });
       assert.equal(error, undefined, `${opt.identifier}=${value}: ${error && error.message}`);
     }

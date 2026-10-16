@@ -200,6 +200,17 @@ test('non-stream translate uses $http.request', () => {
   assert.deepEqual(calls.completion.result.content, { format: 'plain', text: '你好' });
 });
 
+test('polish mode reports the source language as target', () => {
+  global.$option = { ...OPTIONS, mode: 'polish', stream: 'off' };
+  global.$http = {
+    request: (r) => r.handler({ response: { statusCode: 200 }, data: { choices: [{ message: { content: 'Hello.' }, finish_reason: 'stop' }] } }),
+  };
+  const { query, calls } = makeQuery();
+  main.translate(query);
+  assert.equal(calls.completion.result.from, 'en');
+  assert.equal(calls.completion.result.to, 'en');
+});
+
 test('legacy completion callback is used when onCompletion is absent', () => {
   global.$option = { model: 'a/b' };
   let got;

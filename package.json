@@ -1,0 +1,12 @@
+{
+  "name": "bob-plugin-openrouter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenRouter translate plugin for Bob with reasoning, routing and privacy controls",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test 'test/*.test.js'",
+    "coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**' 'test/*.test.js'",
+    "pack": "sh scripts/pack.sh"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "identifier": "com.channinghe.openrouter",
+  "version": "0.1.0",
+  "category": "translate",
+  "name": "OpenRouter",
+  "summary": "OpenRouter 翻译插件：支持思考模式开关、供应商路由、数据策略、备用模型与响应缓存",
+  "icon": "145",
+  "author": "ChanningHe",
+  "homepage": "https://github.com/ChanningHe/bob-plugin-openrouter",
+  "appcast": "https://github.com/ChanningHe/bob-plugin-openrouter/raw/main/appcast.json",
+  "minBobVersion": "1.21.0",
+  "options": [
+    {
+      "identifier": "apiKey",
+      "type": "text",
+      "title": "API Key",
+      "desc": "在 https://openrouter.ai/settings/keys 创建",
+      "textConfig": { "type": "secure", "placeholderText": "sk-or-v1-..." }
+    },
+    {
+      "identifier": "model",
+      "type": "text",
+      "title": "模型",
+      "desc": "模型 ID，见 https://openrouter.ai/models 。支持 :nitro（最快）/ :floor（最便宜）后缀，以及 @preset/名称 引用预设",
+      "textConfig": { "type": "visible", "placeholderText": "google/gemini-2.5-flash" }
+    },
+    {
+      "identifier": "fallbackModels",
+      "type": "text",
+      "title": "备用模型",
+      "desc": "主模型出错、限流或下线时按顺序尝试。多个用逗号或换行分隔，可留空",
+      "textConfig": { "type": "visible", "placeholderText": "anthropic/claude-haiku-4.5, deepseek/deepseek-chat-v3.1" }
+    },
+    {
+      "identifier": "reasoning",
+      "type": "menu",
+      "title": "思考模式",
+      "defaultValue": "off",
+      "desc": "关闭思考翻译最快最省。部分模型强制思考、无法关闭，请点「验证」检查兼容性",
+      "menuValues": [
+        { "title": "关闭", "value": "off" },
+        { "title": "模型默认", "value": "default" },
+        { "title": "最低 (minimal)", "value": "minimal" },
+        { "title": "低 (low)", "value": "low" },
+        { "title": "中 (medium)", "value": "medium" },
+        { "title": "高 (high)", "value": "high" },
+        { "title": "极高 (xhigh)", "value": "xhigh" },
+        { "title": "按 Token 预算", "value": "budget" }
+      ]
+    },
+    {
+      "identifier": "reasoningBudget",
+      "type": "text",
+      "title": "思考 Token 预算",
+      "desc": "仅在「思考模式」为「按 Token 预算」时生效，正整数",
+      "textConfig": { "type": "visible", "placeholderText": "2048" }
+    },
+    {
+      "identifier": "showReasoning",
+      "type": "menu",
+      "title": "显示思考过程",
+      "defaultValue": "show",
+      "desc": "隐藏时模型仍会思考并计费，只是不返回思考内容",
+      "menuValues": [
+        { "title": "显示", "value": "show" },
+        { "title": "隐藏", "value": "hide" }
+      ]
+    },
+    {
+      "identifier": "routing",
+      "type": "menu",
+      "title": "路由策略",
+      "defaultValue": "default",
+      "desc": "OpenRouter 在多个供应商之间选择的排序方式",
+      "menuValues": [
+        { "title": "默认（价格加权负载均衡）", "value": "default" },
+        { "title": "价格最低", "value": "price" },
+        { "title": "吞吐最高", "value": "throughput" },
+        { "title": "延迟最低", "value": "latency" }
+      ]
+    },
+    {
+      "identifier": "providerOnly",
+      "type": "text",
+      "title": "仅使用供应商",
+      "desc": "只允许这些供应商，逗号分隔，例如 openai, azure。留空不限制",
+      "textConfig": { "type": "visible", "placeholderText": "openai, azure" }
+    },
+    {
+      "identifier": "providerIgnore",
+      "type": "text",
+      "title": "排除供应商",
+      "desc": "不使用这些供应商，逗号分隔。留空不排除",
+      "textConfig": { "type": "visible", "placeholderText": "deepinfra" }
+    },
+    {
+      "identifier": "dataPolicy",
+      "type": "menu",
+      "title": "数据策略",
+      "defaultValue": "default",
+      "desc": "限制只路由到不收集数据或零数据保留（ZDR）的供应商。限制越严，可用供应商越少",
+      "menuValues": [
+        { "title": "默认", "value": "default" },
+        { "title": "拒绝数据收集", "value": "deny" },
+        { "title": "仅零数据保留 (ZDR)", "value": "zdr" }
+      ]
+    },
+    {
+      "identifier": "systemPrompt",
+      "type": "text",
+      "title": "系统提示词",
+      "desc": "留空使用内置提示词。可用变量：$sourceLang $targetLang $text",
+      "textConfig": { "type": "visible", "height": 80, "placeholderText": "留空使用内置翻译提示词" }
+    },
+    {
+      "identifier": "userPrompt",
+      "type": "text",
+      "title": "用户提示词模板",
+      "desc": "留空使用内置模板。可用变量：$sourceLang $targetLang $text",
+      "textConfig": { "type": "visible", "height": 60, "placeholderText": "Translate from $sourceLang to $targetLang:\n$text" }
+    },
+    {
+      "identifier": "polishMode",
+      "type": "menu",
+      "title": "同语言润色",
+      "defaultValue": "off",
+      "desc": "源语言与目标语言相同时，改为润色原文（使用内置润色提示词）",
+      "menuValues": [
+        { "title": "关闭", "value": "off" },
+        { "title": "开启", "value": "on" }
+      ]
+    },
+    {
+      "identifier": "showRouteInfo",
+      "type": "menu",
+      "title": "显示路由信息",
+      "defaultValue": "off",
+      "desc": "翻译完成后在译文下方显示实际供应商、模型（含备用切换）和本次费用",
+      "menuValues": [
+        { "title": "关闭", "value": "off" },
+        { "title": "开启", "value": "on" }
+      ]
+    },
+    {
+      "identifier": "temperature",
+      "type": "text",
+      "title": "Temperature",
+      "desc": "0 到 2，留空使用模型默认。部分新模型不支持该参数",
+      "textConfig": { "type": "visible", "placeholderText": "留空使用模型默认" }
+    },
+    {
+      "identifier": "maxTokens",
+      "type": "text",
+      "title": "最大输出 Token",
+      "desc": "包含思考消耗的 Token。开启高强度思考时请设大一些，留空使用模型默认",
+      "textConfig": { "type": "visible", "placeholderText": "留空使用模型默认" }
+    },
+    {
+      "identifier": "outputFormat",
+      "type": "menu",
+      "title": "译文格式",
+      "defaultValue": "markdown",
+      "menuValues": [
+        { "title": "Markdown", "value": "markdown" },
+        { "title": "纯文本", "value": "plain" }
+      ]
+    },
+    {
+      "identifier": "stream",
+      "type": "menu",
+      "title": "流式输出",
+      "defaultValue": "on",
+      "menuValues": [
+        { "title": "开启", "value": "on" },
+        { "title": "关闭", "value": "off" }
+      ]
+    },
+    {
+      "identifier": "responseCache",
+      "type": "menu",
+      "title": "响应缓存",
+      "defaultValue": "off",
+      "desc": "相同请求直接返回缓存结果，不计费。注意：开启后「重新翻译」会得到相同译文",
+      "menuValues": [
+        { "title": "关闭", "value": "off" },
+        { "title": "5 分钟", "value": "300" },
+        { "title": "1 小时", "value": "3600" },
+        { "title": "1 天", "value": "86400" }
+      ]
+    },
+    {
+      "identifier": "timeout",
+      "type": "menu",
+      "title": "超时",
+      "defaultValue": "60",
+      "desc": "开启思考的模型可能需要更长时间",
+      "menuValues": [
+        { "title": "60 秒", "value": "60" },
+        { "title": "120 秒", "value": "120" },
+        { "title": "180 秒", "value": "180" },
+        { "title": "300 秒", "value": "300" }
+      ]
+    },
+    {
+      "identifier": "extraBody",
+      "type": "text",
+      "title": "额外请求参数 (JSON)",
+      "desc": "高级：JSON 对象，深度合并进请求体并覆盖以上设置。例如 {\"provider\":{\"max_price\":{\"prompt\":1}},\"verbosity\":\"low\"}",
+      "textConfig": { "type": "visible", "height": 80, "placeholderText": "{\"top_p\": 0.9}" }
+    },
+    {
+      "identifier": "baseUrl",
+      "type": "text",
+      "title": "API 地址",
+      "desc": "留空使用 https://openrouter.ai/api/v1 ，仅在使用代理时修改",
+      "textConfig": { "type": "visible", "placeholderText": "https://openrouter.ai/api/v1" }
+    }
+  ]
+}

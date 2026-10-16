@@ -1,9 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { buildMessages } = require('../src/lib/prompt');
+const { buildMessages, targetLanguage } = require('../src/lib/prompt');
 const { supportLanguages, languageName } = require('../src/lib/lang');
 
-const cfg = (over = {}) => ({ systemPrompt: null, userPrompt: null, polishMode: false, ...over });
+const cfg = (over = {}) => ({ mode: 'translate', systemPrompt: null, userPrompt: null, polishMode: false, ...over });
 const query = (over = {}) => ({ text: 'good', from: 'auto', to: 'auto', detectFrom: 'en', detectTo: 'zh-Hans', ...over });
 
 test('supportLanguages includes auto and common codes', () => {
@@ -28,13 +28,44 @@ test('default translate prompt uses detected languages', () => {
   assert.match(user.content, /good/);
 });
 
-test('custom templates substitute variables in a single pass', () => {
+test('custom mode substitutes variables in a single pass', () => {
   const [system, user] = buildMessages(
-    cfg({ systemPrompt: 'Sys $sourceLang->$targetLang', userPrompt: '[$text]' }),
+    cfg({ mode: 'custom', systemPrompt: 'Sys $sourceLang->$targetLang', userPrompt: '[$text]' }),
     query({ text: 'literal $targetLang stays' }),
   );
   assert.equal(system.content, 'Sys English->Simplified Chinese');
   assert.equal(user.content, '[literal $targetLang stays]');
+});
+
+test('custom mode without system prompt sends only the user message', () => {
+  const messages = buildMessages(cfg({ mode: 'custom', userPrompt: 'Summarize: $text' }), query());
+  assert.deepEqual(messages, [{ role: 'user', content: 'Summarize: good' }]);
+});
+
+test('custom mode with only a system prompt sends the raw text as user message', () => {
+  const messages = buildMessages(cfg({ mode: 'custom', systemPrompt: 'Explain' }), query());
+  assert.deepEqual(messages, [
+    { role: 'system', content: 'Explain' },
+    { role: 'user', content: 'good' },
+  ]);
+});
+
+test('custom prompts are ignored outside custom mode', () => {
+  const [system] = buildMessages(cfg({ systemPrompt: 'IGNORED' }), query());
+  assert.doesNotMatch(system.content, /IGNORED/);
+});
+
+test('polish mode always polishes in the source language', () => {
+  const [system, user] = buildMessages(cfg({ mode: 'polish' }), query());
+  assert.match(system.content, /polish/i);
+  assert.match(system.content, /English/);
+  assert.doesNotMatch(system.content + user.content, /Simplified Chinese/);
+});
+
+test('targetLanguage: polish keeps the source language', () => {
+  assert.equal(targetLanguage(cfg(), query()), 'zh-Hans');
+  assert.equal(targetLanguage(cfg({ mode: 'custom' }), query()), 'zh-Hans');
+  assert.equal(targetLanguage(cfg({ mode: 'polish' }), query()), 'en');
 });
 
 test('source text cannot close the <text> delimiter', () => {

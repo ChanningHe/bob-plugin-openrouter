@@ -7,6 +7,7 @@ const base = { apiKey: 'sk-or-test', model: 'openai/gpt-5-mini' };
 test('applies defaults for unset options', () => {
   const { config, error } = parseConfig(base);
   assert.equal(error, undefined);
+  assert.equal(config.mode, 'translate');
   assert.equal(config.reasoning, 'off');
   assert.equal(config.showReasoning, true);
   assert.equal(config.routing, 'default');
@@ -123,4 +124,10 @@ test('blank prompts fall back to null (use built-in)', () => {
   const { config } = parseConfig({ ...base, systemPrompt: '   ', userPrompt: 'Translate: $text' });
   assert.equal(config.systemPrompt, null);
   assert.equal(config.userPrompt, 'Translate: $text');
+});
+
+test('custom mode requires at least one prompt', () => {
+  assert.equal(parseConfig({ ...base, mode: 'custom' }).error.type, 'param');
+  assert.equal(parseConfig({ ...base, mode: 'custom', userPrompt: '$text' }).config.mode, 'custom');
+  assert.equal(parseConfig({ ...base, mode: 'polish' }).config.mode, 'polish');
 });

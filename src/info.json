@@ -32,6 +32,18 @@
       "textConfig": { "type": "visible", "placeholderText": "anthropic/claude-haiku-4.5, deepseek/deepseek-chat-v3.1" }
     },
     {
+      "identifier": "mode",
+      "type": "menu",
+      "title": "模式",
+      "defaultValue": "translate",
+      "desc": "翻译：译成目标语言。润色：用原文语言改写润色。自定义：使用下方的系统提示词和用户提示词",
+      "menuValues": [
+        { "title": "翻译", "value": "translate" },
+        { "title": "润色", "value": "polish" },
+        { "title": "自定义", "value": "custom" }
+      ]
+    },
+    {
       "identifier": "reasoning",
       "type": "menu",
       "title": "思考模式",
@@ -109,14 +121,14 @@
       "identifier": "systemPrompt",
       "type": "text",
       "title": "系统提示词",
-      "desc": "留空使用内置提示词。可用变量：$sourceLang $targetLang $text",
-      "textConfig": { "type": "visible", "height": 80, "placeholderText": "留空使用内置翻译提示词" }
+      "desc": "仅自定义模式生效，可留空。可用变量：$sourceLang $targetLang $text",
+      "textConfig": { "type": "visible", "height": 80, "placeholderText": "You are a helpful assistant." }
     },
     {
       "identifier": "userPrompt",
       "type": "text",
       "title": "用户提示词模板",
-      "desc": "留空使用内置模板。可用变量：$sourceLang $targetLang $text",
+      "desc": "仅自定义模式生效，留空时直接发送原文。可用变量：$sourceLang $targetLang $text",
       "textConfig": { "type": "visible", "height": 60, "placeholderText": "Translate from $sourceLang to $targetLang:\n$text" }
     },
     {
@@ -124,7 +136,7 @@
       "type": "menu",
       "title": "同语言润色",
       "defaultValue": "off",
-      "desc": "源语言与目标语言相同时，改为润色原文（使用内置润色提示词）",
+      "desc": "翻译模式下，源语言与目标语言相同时自动改为润色",
       "menuValues": [
         { "title": "关闭", "value": "off" },
         { "title": "开启", "value": "on" }

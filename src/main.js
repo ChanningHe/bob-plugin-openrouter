@@ -122,7 +122,7 @@ function translate(query, completion) {
     outputFormat: config.outputFormat,
     showRouteInfo: config.showRouteInfo,
     from: query.detectFrom,
-    to: query.detectTo,
+    to: prompt.targetLanguage(config, query),
   };
   var req = {
     method: 'POST',

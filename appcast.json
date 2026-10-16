@@ -2,6 +2,14 @@
   "identifier": "com.channinghe.openrouter",
   "versions": [
     {
+      "version": "0.1.2",
+      "desc": "https://github.com/ChanningHe/bob-plugin-openrouter/releases/tag/v0.1.2",
+      "sha256": "38f60579e694ac8b1b2fff1e87340353a42a607a992d1666e804afbdcf3b2c21",
+      "url": "https://github.com/ChanningHe/bob-plugin-openrouter/releases/download/v0.1.2/openrouter-0.1.2.bobplugin",
+      "minBobVersion": "1.21.0",
+      "timestamp": 1792129055461
+    },
+    {
       "version": "0.1.1",
       "desc": "https://github.com/ChanningHe/bob-plugin-openrouter/releases/tag/v0.1.1",
       "sha256": "d65664ed6b5fb7e5662412cd811ad4b40c6e6a1070d38585dcc6856307732f58",

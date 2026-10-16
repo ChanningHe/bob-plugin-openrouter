@@ -1,6 +1,6 @@
 {
   "name": "bob-plugin-openrouter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "OpenRouter translate plugin for Bob with reasoning, routing and privacy controls",
   "license": "MIT",

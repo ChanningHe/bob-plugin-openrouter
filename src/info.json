@@ -1,6 +1,6 @@
 {
   "identifier": "com.channinghe.openrouter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "category": "translate",
   "name": "OpenRouter",
   "summary": "OpenRouter 翻译插件：支持思考模式开关、供应商路由、数据策略、备用模型与响应缓存",
